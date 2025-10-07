@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>eGuide.my — Malaysia Business Formation & Directory</title>
+  <meta name="description" content="eGuide.my helps you register a Sdn Bhd in Malaysia and find trusted business services. Single-file PWA with client area." />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' rx='64' fill='%230f172a'/%3E%3Cpath fill='%23fff' d='M62 172c0-41 33-74 74-74h58v24h-58c-28 0-50 22-50 50H62Zm0-60c0-27 9-49 27-67s41-27 67-27h38v24h-38c-40 0-70 30-70 70H62Z'/%3E%3C/svg%3E" />
+  <style>
+    :root{
+      --bg:#f8fafc;--card:#ffffff;--muted:#475569;--text:#0f172a;--brand:#0ea5e9;--accent:#0284c7;--ring:#93c5fd;
+      --ok:#16a34a;--warn:#f59e0b;--err:#ef4444;--line:#e2e8f0;--shadow:0 10px 30px rgba(2,6,23,.06)
+    }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--text);font:16px/1.65 Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"}
+    a{color:inherit;text-decoration:none}
+    .container{max-width:1200px;margin:0 auto;padding:0 20px}
+    .btn{display:inline-flex;gap:.5rem;align-items:center;border:1px solid transparent;border-radius:12px;padding:.8rem 1.1rem;background:var(--brand);color:#ffffff;font-weight:700;box-shadow:var(--shadow);transition:.2s}
+    .btn:hover{transform:translateY(-1px);filter:saturate(1.1)}
+    .btn.outline{background:transparent;border-color:var(--line);color:var(--accent)}
+    .chip{display:inline-flex;align-items:center;gap:.5rem;border:1px solid var(--line);padding:.25rem .6rem;border-radius:999px;color:var(--accent);font-size:.85rem;background:#e0f2fe}
+    .badge{padding:.2rem .55rem;border-radius:6px;background:#eff6ff;color:#1d4ed8;border:1px solid #dbeafe;font-size:.75rem}
+
+    /* Header */
+    header{position:sticky;top:0;z-index:1000;background:rgba(255,255,255,.9);backdrop-filter:saturate(140%) blur(6px);border-bottom:1px solid var(--line)}
+    .nav{display:flex;align-items:center;justify-content:space-between;height:70px}
+    .brand{display:flex;align-items:center;gap:.75rem;font-weight:800}
+    .brand .logo{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#e0f2fe;box-shadow:inset 0 0 0 1px #bae6fd}
+    nav ul{display:flex;gap:.5rem;list-style:none;margin:0;padding:0}
+    nav a{padding:.55rem .75rem;border-radius:10px;color:#334155;font-weight:600}
+    nav a.active{color:#0f172a;background:#e2e8f0;border:1px solid var(--line)}
+    .nav-cta{display:flex;gap:.5rem;align-items:center}
+    .hamb{display:none;width:40px;height:40px;border:1px solid var(--line);border-radius:12px;align-items:center;justify-content:center}
+
+    /* Sections */
+    section{padding:64px 0;border-bottom:1px solid var(--line)}
+    .hero{padding:80px 0 50px;background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%)}
+    .hero h1{font-size:clamp(2rem,3.2vw,3.2rem);letter-spacing:-.02em;margin:.5rem 0 1rem}
+    .sub{color:#475569;max-width:820px}
+    .grid{display:grid;gap:20px}
+    .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    @media (max-width:900px){.grid-3,.grid-2{grid-template-columns:1fr} .nav ul{display:none} .hamb{display:flex}}
+
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+    .card h3{margin:.25rem 0 .6rem}
+    .muted{color:#475569}
+
+    /* Directory table */
+    table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+    th,td{text-align:left;padding:12px 14px;border-bottom:1px solid #eef2f7}
+    th{background:#f1f5f9;color:#0f172a;font-weight:700}
+    tr:last-child td{border-bottom:0}
+
+    /* Footer */
+    footer{padding:40px 0;color:#64748b;background:#fff}
+    .footer-grid{display:grid;gap:20px;grid-template-columns:2fr 1fr 1fr}
+    @media (max-width:900px){.footer-grid{grid-template-columns:1fr}}
+
+    /* Mobile Menu */
+    .mobile-menu{position:fixed;inset:0;background:rgba(2,6,23,.6);backdrop-filter:blur(8px);display:none}
+    .mobile-sheet{position:absolute;right:12px;top:12px;left:12px;border-radius:16px;background:#ffffff;border:1px solid var(--line);padding:12px}
+    .mobile-sheet a{display:block;padding:12px;border-radius:10px;color:#0f172a}
+    .mobile-sheet a + a{border-top:1px solid var(--line)}
+
+    /* Forms */
+    .input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#ffffff;color:#0f172a}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    .row .col{flex:1 1 240px}
+    .help{font-size:.85rem;color:#64748b}
+
+    /* Page visibility */
+    [data-route]{display:none}
+    [data-route].show{display:block}
+
+    /* Accent separators */
+    .sep{height:1px;background:linear-gradient(90deg,transparent, #cbd5e1, transparent);margin:30px 0}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="#/home" data-link>
+        <span class="logo" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="2" width="20" height="20" rx="5" fill="#06b6d4"/>
+            <path d="M8 16c0-3.314 2.686-6 6-6h4" stroke="#001016" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span>eGuide<span style="color:#67e8f9">.my</span></span>
+      </a>
+      <nav>
+        <ul>
+          <li><a href="#/home" data-link>Home</a></li>
+          <li><a href="#/sdn-bhd" data-link>Sdn Bhd</a></li>
+          <li><a href="#/directory" data-link>Directory</a></li>
+          <li><a href="#/virtual-office" data-link>Virtual Office</a></li>
+          <li><a href="#/pricing" data-link>Pricing</a></li>
+          <li><a href="#/faq" data-link>FAQ</a></li>
+          <li><a href="#/contact" data-link>Contact</a></li>
+        </ul>
+      </nav>
+      <div class="nav-cta">
+        <a href="#/login" class="btn outline" data-link>Client Login</a>
+        <button class="hamb" id="hamb" aria-label="Open menu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 7h16M4 12h16M4 17h16" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+      <div class="mobile-sheet">
+        <a href="#/home" data-link>Home</a>
+        <a href="#/sdn-bhd" data-link>Sdn Bhd</a>
+        <a href="#/directory" data-link>Directory</a>
+        <a href="#/virtual-office" data-link>Virtual Office</a>
+        <a href="#/pricing" data-link>Pricing</a>
+        <a href="#/faq" data-link>FAQ</a>
+        <a href="#/contact" data-link>Contact</a>
+        <a href="#/login" data-link>Client Login</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HOME -->
+  <main id="app">
+    <section class="hero" data-route="#/home">
+      <div class="container">
+        <div class="chip">Trusted - Fast - Professional</div>
+        <h1>Register your Sdn Bhd and find the right partners in Malaysia</h1>
+        <p class="sub">eGuide.my is a modern guide for founders and SMEs. We explain how to set up a Sdn Bhd, help you compare providers, and keep everything simple with a clean client area. Not a government site. We partner with licensed company secretaries.</p>
+        <div class="row" style="margin-top:18px">
+          <a href="#/sdn-bhd" class="btn" data-link>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12h14M13 5l7 7-7 7" stroke="#001016" stroke-width="2" stroke-linecap="round"/></svg>
+            Start Sdn Bhd Guide</a>
+          <a href="#/directory" class="btn outline" data-link>Explore Directory</a>
+        </div>
+        <div class="sep"></div>
+        <div class="grid grid-3">
+          <div class="card">
+            <span class="badge">Step 1</span>
+            <h3>Name Search & Reservation</h3>
+            <p class="muted">Check availability and reserve your company name with SSM guidelines in mind. We provide clear tips to pass name checks the first time.</p>
+          </div>
+          <div class="card">
+            <span class="badge">Step 2</span>
+            <h3>Incorporation Documents</h3>
+            <p class="muted">Prepare super simple forms. Your licensed company secretary will file statutory documents and obtain your SSM certificate.</p>
+          </div>
+          <div class="card">
+            <span class="badge">Step 3</span>
+            <h3>After Incorporation</h3>
+            <p class="muted">Open bank accounts, register taxes, and set up payroll. Our directory lists vetted providers for accounting, tax, and HR.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SDN BHD PAGE -->
+    <section data-route="#/sdn-bhd">
+      <div class="container">
+        <h2 style="margin:0 0 10px">Sdn Bhd - what you need to know</h2>
+        <p class="muted">A Sdn Bhd (Sendirian Berhad) is a private limited company in Malaysia. It limits shareholder liability to paid-up capital and is the most common structure for startups and SMEs.</p>
+        <div class="grid grid-2" style="margin-top:16px">
+          <div class="card">
+            <h3>Basic requirements</h3>
+            <ul class="muted">
+              <li>At least one director ordinarily residing in Malaysia</li>
+              <li>At least one shareholder (can be the same person)</li>
+              <li>A registered office and a licensed company secretary</li>
+              <li>Paid-up capital can start as low as RM1</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Typical timeline</h3>
+            <ul class="muted">
+              <li>Name search - 1 to 2 days</li>
+              <li>Document preparation - 1 to 3 days</li>
+              <li>SSM approval and incorporation - 1 to 3 days</li>
+            </ul>
+          </div>
+        </div>
+        <div class="grid grid-3" style="margin-top:16px">
+          <div class="card">
+            <h3>Indicative costs</h3>
+            <p class="muted">Company secretary packages often start around RM60 - RM120 per month. One-time incorporation fees vary by provider. Use our directory to compare.</p>
+          </div>
+          <div class="card">
+            <h3>Tax & compliance</h3>
+            <p class="muted">Sdn Bhd pays corporate income tax. Keep proper accounts and file annual returns. Appoint an auditor unless exempted under thresholds.</p>
+          </div>
+          <div class="card">
+            <h3>Why use eGuide.my</h3>
+            <p class="muted">We simplify decisions, highlight trusted partners, and give you a clean client area to track steps - name search, documents, banking, and more.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIRECTORY PAGE -->
+    <section data-route="#/directory">
+      <div class="container">
+        <h2 style="margin:0 0 10px">Business service directory</h2>
+        <p class="muted">Browse vetted providers for company secretarial, accounting, tax, audit, legal, banking support, and payroll. </p>
+        <div class="card">
+          <div class="row">
+            <div class="col"><input id="q" class="input" placeholder="Search provider or keyword (eg. secretary, tax)" /></div>
+            <div class="col">
+              <select id="cat" class="input">
+                <option value="">All categories</option>
+                <option>Company Secretary</option>
+                <option>Accounting</option>
+                <option>Tax</option>
+                <option>Audit</option>
+                <option>Legal</option>
+                <option>Banking Setup</option>
+                <option>Payroll</option>
+              </select>
+            </div>
+            <div class="col"><button id="filterBtn" class="btn" type="button">Filter</button></div>
+          </div>
+          <div class="sep"></div>
+          <div id="dirCount" class="help"></div>
+          <div class="sep" style="margin:16px 0"></div>
+          <div style="overflow:auto">
+            <table id="dirTable" aria-label="Directory results">
+              <thead>
+                <tr><th>Provider</th><th>Category</th><th>Location</th><th>Website</th><th>Rating</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- VIRTUAL OFFICE PAGE -->
+    <section data-route="#/virtual-office">
+      <div class="container">
+        <h2 style="margin:0 0 10px">Virtual Office - credible address without a lease</h2>
+        <p class="muted">Launch your Sdn Bhd with a professional business address and essential office services - no physical tenancy needed. Ideal for founders working remotely or testing the market.</p>
+        <div class="grid grid-3" style="margin-top:16px">
+          <div class="card">
+            <h3>What you get</h3>
+            <ul class="muted">
+              <li>Registered office address for SSM</li>
+              <li>Mail handling and scanning</li>
+              <li>Call forwarding (addon)</li>
+              <li>Meeting room on demand (addon)</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Locations</h3>
+            <p class="muted">Kuala Lumpur, Petaling Jaya, Johor Bahru, George Town. Choose the city that fits your clients and banking preferences.</p>
+            <div class="sep"></div>
+            <span class="badge">Tip</span> <span class="help">Pick address city to match your main operations where possible.</span>
+          </div>
+          <div class="card">
+            <h3>Why it works</h3>
+            <p class="muted">SSM accepts virtual office addresses as registered offices when maintained by a compliant provider. Keep overheads low while staying compliant.</p>
+          </div>
+        </div>
+        <div class="grid grid-3" style="margin-top:16px">
+          <div class="card">
+            <h3>Starter VO</h3>
+            <ul class="muted">
+              <li>Registered address</li>
+              <li>Mail notification</li>
+              <li>Monthly mail scan quota</li>
+            </ul>
+            <div class="sep"></div>
+            <div><strong>From RM39/mo</strong></div>
+          </div>
+          <div class="card">
+            <h3>Business VO</h3>
+            <ul class="muted">
+              <li>Everything in Starter</li>
+              <li>Priority scanning</li>
+              <li>Optional call forwarding</li>
+            </ul>
+            <div class="sep"></div>
+            <div><strong>From RM89/mo</strong></div>
+          </div>
+          <div class="card">
+            <h3>Premium VO</h3>
+            <ul class="muted">
+              <li>Everything in Business</li>
+              <li>Meeting room credits</li>
+              <li>Multi-city mail routing</li>
+            </ul>
+            <div class="sep"></div>
+            <div><strong>From RM149/mo</strong></div>
+          </div>
+        </div>
+        <div class="row" style="margin-top:16px">
+          <a href="#/contact" class="btn" data-link>Ask about Virtual Office</a>
+          <a href="#/pricing" class="btn outline" data-link>Compare with Sdn Bhd plans</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRICING PAGE -->
+    <section data-route="#/pricing">
+      <div class="container">
+        <h2 style="margin:0 0 10px">Transparent pricing</h2>
+        <p class="muted">Fixed-fee clarity. Pick the support you need. No surprise charges.</p>
+        <div class="grid grid-3" style="margin-top:16px">
+          <div class="card">
+            <h3>Starter</h3>
+            <p class="muted">For solo founders testing ideas.</p>
+            <ul class="muted">
+              <li>Incorporation guidance</li>
+              <li>Directory matchmaking</li>
+              <li>Email support</li>
+            </ul>
+            <div class="sep"></div>
+            <div><strong>RM0</strong> - pay providers directly</div>
+          </div>
+          <div class="card">
+            <h3>Grow</h3>
+            <p class="muted">For teams that want hand-holding.</p>
+            <ul class="muted">
+              <li>Priority concierge</li>
+              <li>Document checklists</li>
+              <li>Banking intro</li>
+            </ul>
+            <div class="sep"></div>
+            <div><strong>RM199</strong> one-time</div>
+          </div>
+          <div class="card">
+            <h3>Scale</h3>
+            <p class="muted">For growing SMEs and foreign-owned entities.</p>
+            <ul class="muted">
+              <li>Bespoke onboarding</li>
+              <li>Migration assistance</li>
+              <li>Dedicated manager</li>
+            </ul>
+            <div class="sep"></div>
+            <div>From <strong>RM899</strong></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ PAGE -->
+    <section data-route="#/faq">
+      <div class="container">
+        <h2 style="margin:0 0 10px">Frequently asked questions</h2>
+        <div class="grid" style="gap:12px">
+          <details class="card"><summary><strong>Is eGuide.my a government website</strong></summary><p class="muted">No. We are an independent guide and directory. We partner with licensed company secretaries to deliver services.</p></details>
+          <details class="card"><summary><strong>Can foreigners be directors or shareholders</strong></summary><p class="muted">Yes - foreigners can own shares and be directors subject to having at least one resident director in Malaysia and any sector requirements.</p></details>
+          <details class="card"><summary><strong>How long does incorporation take</strong></summary><p class="muted">With a prepared name and documents, many providers complete the process within a week.</p></details>
+          <details class="card"><summary><strong>What is the difference between Enterprise and Sdn Bhd</strong></summary><p class="muted">Enterprise is a sole proprietorship or partnership with unlimited liability. Sdn Bhd is a limited liability company that is more suitable for scaling and fundraising.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT PAGE -->
+    <section data-route="#/contact">
+      <div class="container">
+        <h2 style="margin:0 0 10px">Contact us</h2>
+        <div class="grid grid-2" style="margin-top:16px">
+          <form id="contactForm" class="card" onsubmit="return false;">
+            <div class="row">
+              <div class="col"><label>Name<input class="input" name="name" required /></label></div>
+              <div class="col"><label>Email<input class="input" name="email" type="email" required /></label></div>
+            </div>
+            <div style="margin-top:10px"><label>Message<textarea class="input" name="message" rows="5" required></textarea></label></div>
+            <div style="margin-top:14px"><button class="btn" id="sendMsg">Send message</button> <span class="help" id="contactHint">We respond within 1 business day.</span></div>
+          </form>
+          <div class="card">
+            <h3>Our promise</h3>
+            <p class="muted">We respect your time and data. Your message goes straight to a secure inbox. We do not sell or rent your information.</p>
+            <div class="sep"></div>
+            <h3>Registered office</h3>
+            <p class="muted">Kuala Lumpur - Selangor - Johor - Penang (by appointment)</p>
+            <p class="muted">Business hours: Mon - Fri, 9.30am to 6.00pm</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOGIN PAGE -->
+    <section data-route="#/login">
+      <div class="container">
+        <h2 style="margin:0 0 10px">Client login</h2>
+        <p class="muted">Access your progress - name search, documents, and onboarding tasks.</p>
+        <form id="loginForm" class="card" style="max-width:520px" onsubmit="return false;">
+          <label>Email<input class="input" name="email" type="email" autocomplete="username" required /></label>
+          <div style="height:8px"></div>
+          <label>Password<input class="input" name="password" type="password" autocomplete="current-password" required minlength="6" /></label>
+          <div class="row" style="margin-top:12px;align-items:center">
+            <button class="btn" id="loginBtn">Sign in</button>
+            <a class="help" style="margin-left:8px" href="#/reset" data-link>Forgot password</a>
+          </div>
+          
+        </form>
+      </div>
+    </section>
+
+    <!-- RESET PAGE -->
+    <section data-route="#/reset">
+      <div class="container">
+        <h2>Password reset</h2>
+        <form id="resetForm" class="card" style="max-width:520px" onsubmit="return false;">
+          <label>Email<input class="input" name="email" type="email" required /></label>
+          <div style="height:10px"></div>
+          <button class="btn" id="resetBtn">Send reset link</button>
+          <p class="help" style="margin-top:10px">We will email a reset link if the address exists in our system.</p>
+        </form>
+      </div>
+    </section>
+
+    <!-- DASHBOARD (after login) -->
+    <section data-route="#/dashboard">
+      <div class="container">
+        <div class="row" style="align-items:center;justify-content:space-between">
+          <h2 style="margin:0">Client dashboard</h2>
+          <div>
+            <span id="userEmail" class="badge"></span>
+            <button class="btn outline" id="logoutBtn">Log out</button>
+          </div>
+        </div>
+        <div class="grid grid-3" style="margin-top:16px">
+          <div class="card">
+            <h3>Onboarding checklist</h3>
+            <ul class="muted" id="tasks"></ul>
+            <button class="btn" id="markAll">Mark all complete</button>
+          </div>
+          <div class="card">
+            <h3>Documents</h3>
+            <p class="muted">Upload your passport or NRIC, residential address, and company name choices. </p>
+            <div class="row"><button class="btn outline">Upload ID</button><button class="btn outline">Upload address proof</button></div>
+          </div>
+          <div class="card">
+            <h3>Support</h3>
+            <p class="muted">Need help with banking introductions or tax registration - reach out to our concierge.</p>
+            <a href="#/contact" class="btn" data-link>Message concierge</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-grid">
+      <div>
+        <div class="brand"><span class="logo"></span><strong>eGuide.my</strong></div>
+        <p class="muted">Independent guide - not a government website. We connect you with licensed professionals to incorporate and grow your Sdn Bhd.</p>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <a href="#/home" data-link>Home</a><br/>
+        <a href="#/sdn-bhd" data-link>Sdn Bhd</a><br/>
+        <a href="#/directory" data-link>Directory</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="#/faq" data-link>FAQ</a><br/>
+        <a href="#/contact" data-link>Contact</a><br/>
+        <span class="help">© <span id="year"></span> eGuide.my - All rights reserved</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // SPA - simple router
+    const routes = Array.from(document.querySelectorAll('[data-route]'));
+    const links = Array.from(document.querySelectorAll('[data-link]'));
+    const navLinks = () => Array.from(document.querySelectorAll('header nav a[data-link]'));
+    const mobileMenu = document.getElementById('mobileMenu');
+    const hamb = document.getElementById('hamb');
+
+    function showRoute(hash){
+      if(!hash || hash === '#') hash = '#/home';
+      routes.forEach(s => s.classList.toggle('show', s.getAttribute('data-route') === hash));
+      navLinks().forEach(a => a.classList.toggle('active', a.getAttribute('href') === hash));
+      // Close mobile menu on navigation
+      mobileMenu.style.display = 'none';
+      mobileMenu.setAttribute('aria-hidden','true');
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    window.addEventListener('hashchange', () => showRoute(location.hash));
+    links.forEach(a => a.addEventListener('click', e => { /* allow default - hash change triggers router */ }));
+    showRoute(location.hash);
+
+    hamb.addEventListener('click', () => {
+      const open = mobileMenu.style.display === 'block';
+      mobileMenu.style.display = open ? 'none' : 'block';
+      mobileMenu.setAttribute('aria-hidden', open ? 'true' : 'false');
+    });
+
+    // Directory data
+    const data = [
+      {name:'Aegis Corporate', cat:'Company Secretary', city:'Kuala Lumpur', url:'https://aegiscorporate.my', rating:4.8},
+      {name:'BluePeak Accounting', cat:'Accounting', city:'Petaling Jaya', url:'https://bluepeakaccounting.com.my', rating:4.6},
+      {name:'TaxEase Advisory', cat:'Tax', city:'Johor Bahru', url:'https://taxease.my', rating:4.7},
+      {name:'AuditPro Partners', cat:'Audit', city:'George Town', url:'https://auditpropartners.com', rating:4.5},
+      {name:'Lex & Co', cat:'Legal', city:'Shah Alam', url:'https://lexandco.my', rating:4.3},
+      {name:'BankingBridge', cat:'Banking Setup', city:'Kuala Lumpur', url:'https://bankingbridge.co', rating:4.4},
+      {name:'Payright Payroll', cat:'Payroll', city:'Cyberjaya', url:'https://payrightpayroll.com', rating:4.2},
+      {name:'Resident Director Hub', cat:'Company Secretary', city:'Subang Jaya', url:'https://residentdirectorhub.my', rating:4.1},
+      {name:'CharterWorks Secretarial', cat:'Company Secretary', city:'Kuching', url:'https://charterworks.my', rating:4.6},
+      {name:'LedgerLine', cat:'Accounting', city:'Ipoh', url:'https://ledgerline.com.my', rating:4.4},
+      {name:'TaxWave Consulting', cat:'Tax', city:'Kota Kinabalu', url:'https://taxwave.asia', rating:4.5},
+      {name:'AuditAxis', cat:'Audit', city:'Miri', url:'https://auditaxis.biz', rating:4.3},
+      {name:'Covenant Legal', cat:'Legal', city:'Alor Setar', url:'https://covenantlegal.my', rating:4.4},
+      {name:'BankLaunch', cat:'Banking Setup', city:'Seremban', url:'https://banklaunch.co', rating:4.2},
+      {name:'PayrollCraft', cat:'Payroll', city:'Melaka', url:'https://payrollcraft.io', rating:4.1},
+      {name:'Incorp Nexus', cat:'Company Secretary', city:'Kuala Lumpur', url:'https://incorpnexus.my', rating:4.7},
+      {name:'BalanceWorks', cat:'Accounting', city:'Johor Bahru', url:'https://balanceworks.com.my', rating:4.5},
+      {name:'TaxPilot', cat:'Tax', city:'George Town', url:'https://taxpilot.my', rating:4.6},
+      {name:'Assure Audit', cat:'Audit', city:'Petaling Jaya', url:'https://assureaudit.com.my', rating:4.4},
+      {name:'Harbor Legal', cat:'Legal', city:'Shah Alam', url:'https://harborlegal.my', rating:4.2},
+      {name:'BankReady', cat:'Banking Setup', city:'Klang', url:'https://bankready.co', rating:4.2},
+      {name:'SwiftPayroll', cat:'Payroll', city:'Kota Bharu', url:'https://swiftpayroll.app', rating:4.0},
+      {name:'PremierCorpSec', cat:'Company Secretary', city:'Kuala Lumpur', url:'https://premiercorpsec.my', rating:4.8},
+      {name:'NUMA Accounts', cat:'Accounting', city:'Subang Jaya', url:'https://numaaccounts.com', rating:4.4},
+      {name:'TaxSprint', cat:'Tax', city:'Sandakan', url:'https://taxsprint.asia', rating:4.3},
+      {name:'Checkmate Audit', cat:'Audit', city:'Sibu', url:'https://checkmateaudit.com', rating:4.2},
+      {name:'Atlas Legal', cat:'Legal', city:'Kota Kinabalu', url:'https://atlaslegal.my', rating:4.3},
+      {name:'Onboard Banking', cat:'Banking Setup', city:'Johor Bahru', url:'https://onboardbanking.co', rating:4.1},
+      {name:'TeamPayroll', cat:'Payroll', city:'Kangar', url:'https://teampayroll.io', rating:4.1},
+      {name:'Vertex Secretarial', cat:'Company Secretary', city:'George Town', url:'https://vertexsecretarial.my', rating:4.5},
+      {name:'ClearBooks House', cat:'Accounting', city:'Kuala Terengganu', url:'https://clearbookshouse.com.my', rating:4.3},
+      {name:'Taxly', cat:'Tax', city:'Kuantan', url:'https://taxly.my', rating:4.6},
+      {name:'Auditlane', cat:'Audit', city:'Taiping', url:'https://auditlane.com', rating:4.2},
+      {name:'Beacon Law', cat:'Legal', city:'Muar', url:'https://beaconlaw.my', rating:4.2},
+      {name:'BankLinks', cat:'Banking Setup', city:'Kuala Lumpur', url:'https://banklinks.co', rating:4.3},
+      {name:'PayrollBay', cat:'Payroll', city:'Petaling Jaya', url:'https://payrollbay.com', rating:4.2},
+      {name:'Axia Corporate', cat:'Company Secretary', city:'Shah Alam', url:'https://axiacorporate.my', rating:4.6},
+      {name:'FinEdge Accounting', cat:'Accounting', city:'Klang', url:'https://finedgeaccounting.com', rating:4.4},
+      {name:'TaxBridge', cat:'Tax', city:'Johor Bahru', url:'https://taxbridge.my', rating:4.7},
+      {name:'AuditNorth', cat:'Audit', city:'George Town', url:'https://auditnorth.biz', rating:4.4},
+      {name:'Prime Legal Studio', cat:'Legal', city:'Seremban', url:'https://primelegal.studio', rating:4.1},
+      {name:'BankRoute', cat:'Banking Setup', city:'Kuala Lumpur', url:'https://bankroute.co', rating:4.2},
+      {name:'PayrollPulse', cat:'Payroll', city:'Cyberjaya', url:'https://payrollpulse.io', rating:4.0},
+      {name:'FirstClass Secretarial', cat:'Company Secretary', city:'Ipoh', url:'https://firstclasssec.com.my', rating:4.5},
+      {name:'Ledgerly', cat:'Accounting', city:'Melaka', url:'https://ledgerly.my', rating:4.3},
+      {name:'TaxHarbor', cat:'Tax', city:'Shah Alam', url:'https://taxharbor.com', rating:4.5},
+      {name:'Apollo Audit', cat:'Audit', city:'Petaling Jaya', url:'https://apolloaudit.co', rating:4.3},
+      {name:'JurisLink', cat:'Legal', city:'Kuala Lumpur', url:'https://jurislink.my', rating:4.4},
+      {name:'BankPilot', cat:'Banking Setup', city:'George Town', url:'https://bankpilot.co', rating:4.1},
+      {name:'PayDeck', cat:'Payroll', city:'Johor Bahru', url:'https://paydeck.app', rating:4.1},
+      {name:'Incorpio', cat:'Company Secretary', city:'Kuala Lumpur', url:'https://incorpio.my', rating:4.7},
+      {name:'Accrual Lab', cat:'Accounting', city:'Shah Alam', url:'https://accruallab.com', rating:4.2},
+      {name:'TaxOrbit', cat:'Tax', city:'Petaling Jaya', url:'https://taxorbit.my', rating:4.4},
+      {name:'TrueNorth Audit', cat:'Audit', city:'Johor Bahru', url:'https://truenorthaudit.com', rating:4.2},
+      {name:'Anchor Legal', cat:'Legal', city:'George Town', url:'https://anchorlegal.my', rating:4.3},
+      {name:'BankFoundry', cat:'Banking Setup', city:'Kuala Lumpur', url:'https://bankfoundry.co', rating:4.2},
+      {name:'PayHub', cat:'Payroll', city:'Subang Jaya', url:'https://payhub.cloud', rating:4.0},
+      {name:'Crest Secretarial', cat:'Company Secretary', city:'Kota Kinabalu', url:'https://crestsecretarial.my', rating:4.5},
+      {name:'BrightLedger', cat:'Accounting', city:'Kuching', url:'https://brightledger.com.my', rating:4.4},
+      {name:'TaxCloud', cat:'Tax', city:'Ipoh', url:'https://taxcloud.my', rating:4.5},
+      {name:'AuditWave', cat:'Audit', city:'Kuantan', url:'https://auditwave.biz', rating:4.1},
+      {name:'Equity Legal', cat:'Legal', city:'Shah Alam', url:'https://equitylegal.my', rating:4.2},
+      {name:'BankPort', cat:'Banking Setup', city:'Johor Bahru', url:'https://bankport.co', rating:4.3},
+      {name:'PayrollPilot', cat:'Payroll', city:'George Town', url:'https://payrollpilot.io', rating:4.1},
+      {name:'Summit Secretarial', cat:'Company Secretary', city:'Kuala Lumpur', url:'https://summitsecretarial.my', rating:4.8},
+      {name:'Clerks & Co', cat:'Accounting', city:'Petaling Jaya', url:'https://clerksnco.com', rating:4.3},
+      {name:'TaxSpring', cat:'Tax', city:'Shah Alam', url:'https://taxspring.my', rating:4.4},
+      {name:'AuditVista', cat:'Audit', city:'Johor Bahru', url:'https://auditvista.com', rating:4.2},
+      {name:'Harbor & Hart', cat:'Legal', city:'George Town', url:'https://harborhart.my', rating:4.1},
+      {name:'Bankly', cat:'Banking Setup', city:'Klang', url:'https://bankly.co', rating:4.2},
+      {name:'Payrollwise', cat:'Payroll', city:'Melaka', url:'https://payrollwise.io', rating:4.1},
+      {name:'Orbit Corporate', cat:'Company Secretary', city:'Seremban', url:'https://orbitcorporate.my', rating:4.5},
+      {name:'Prime Accounts', cat:'Accounting', city:'Kuala Lumpur', url:'https://primeaccounts.com.my', rating:4.4},
+      {name:'TaxBeacon', cat:'Tax', city:'Subang Jaya', url:'https://taxbeacon.my', rating:4.5},
+      {name:'AuditCore', cat:'Audit', city:'Kota Kinabalu', url:'https://auditcore.biz', rating:4.3},
+      {name:'Civic Legal', cat:'Legal', city:'Miri', url:'https://civiclegal.my', rating:4.2},
+      {name:'BankLaunch Asia', cat:'Banking Setup', city:'Kuala Lumpur', url:'https://banklaunch.asia', rating:4.3},
+      {name:'PayrollEdge', cat:'Payroll', city:'Ipoh', url:'https://payrolledge.cloud', rating:4.0},
+      {name:'Axis Secretarial', cat:'Company Secretary', city:'Petaling Jaya', url:'https://axissecretarial.com.my', rating:4.6},
+      {name:'Nimbus Accounting', cat:'Accounting', city:'Shah Alam', url:'https://nimbusaccounting.co', rating:4.3},
+      {name:'TaxCraft', cat:'Tax', city:'Johor Bahru', url:'https://taxcraft.my', rating:4.5},
+      {name:'AuditBridge', cat:'Audit', city:'George Town', url:'https://auditbridge.com', rating:4.2},
+      {name:'JurisWave', cat:'Legal', city:'Kuala Lumpur', url:'https://juriswave.my', rating:4.3},
+      {name:'BankCrest', cat:'Banking Setup', city:'Petaling Jaya', url:'https://bankcrest.co', rating:4.1},
+      {name:'ZenPayroll', cat:'Payroll', city:'Shah Alam', url:'https://zenpayroll.app', rating:4.1},
+      {name:'NorthStar Corporate', cat:'Company Secretary', city:'Johor Bahru', url:'https://northstarcorporate.my', rating:4.7},
+      {name:'LedgerPeak', cat:'Accounting', city:'George Town', url:'https://ledgerpeak.com', rating:4.4},
+      {name:'TaxAnchor', cat:'Tax', city:'Klang', url:'https://taxanchor.my', rating:4.3},
+      {name:'AuditPrime', cat:'Audit', city:'Seremban', url:'https://auditprime.biz', rating:4.2},
+      {name:'Clover Law', cat:'Legal', city:'Cyberjaya', url:'https://cloverlaw.my', rating:4.1},
+      {name:'BankForge', cat:'Banking Setup', city:'Kuala Lumpur', url:'https://bankforge.co', rating:4.2},
+      {name:'PayrollDock', cat:'Payroll', city:'Kuching', url:'https://payrolldock.io', rating:4.0},
+      {name:'Synergy Secretarial', cat:'Company Secretary', city:'Ipoh', url:'https://synergysecretarial.my', rating:4.6},
+      {name:'Pinnacle Accounts', cat:'Accounting', city:'Melaka', url:'https://pinnacleaccounts.com.my', rating:4.4},
+      {name:'TaxShift', cat:'Tax', city:'Kota Bharu', url:'https://taxshift.my', rating:4.5},
+      {name:'AuditPort', cat:'Audit', city:'Kuala Terengganu', url:'https://auditport.com', rating:4.2},
+      {name:'Covenant & Partners', cat:'Legal', city:'Shah Alam', url:'https://covenantpartners.my', rating:4.2},
+      {name:'BankAtlas', cat:'Banking Setup', city:'Johor Bahru', url:'https://bankatlas.co', rating:4.3},
+      {name:'PayrollSpark', cat:'Payroll', city:'George Town', url:'https://payrollspark.app', rating:4.1},
+      {name:'RocketCorpSec', cat:'Company Secretary', city:'Petaling Jaya', url:'https://rocketcorpsec.my', rating:4.6},
+      {name:'Helix Accounting', cat:'Accounting', city:'Shah Alam', url:'https://helixaccounting.com', rating:4.3},
+      {name:'TaxPilot Pro', cat:'Tax', city:'Johor Bahru', url:'https://taxpilotpro.my', rating:4.6},
+      {name:'AuditSphere', cat:'Audit', city:'George Town', url:'https://auditsphere.biz', rating:4.2},
+      {name:'Libra Legal', cat:'Legal', city:'Kuala Lumpur', url:'https://libralegal.my', rating:4.3},
+      {name:'BankAble', cat:'Banking Setup', city:'Petaling Jaya', url:'https://bankable.co', rating:4.1},
+      {name:'PayOrbit', cat:'Payroll', city:'Shah Alam', url:'https://payorbit.cloud', rating:4.0},
+      {name:'Citrine Secretarial', cat:'Company Secretary', city:'Johor Bahru', url:'https://citrinesecretarial.my', rating:4.5},
+      {name:'LedgerHive', cat:'Accounting', city:'George Town', url:'https://ledgerhive.com', rating:4.4},
+      {name:'TaxRoute', cat:'Tax', city:'Klang', url:'https://taxroute.my', rating:4.3},
+      {name:'AuditCraft', cat:'Audit', city:'Seremban', url:'https://auditcraft.com', rating:4.2},
+      {name:'Crescent Law', cat:'Legal', city:'Cyberjaya', url:'https://crescentlaw.my', rating:4.1},
+      {name:'BankPilot Asia', cat:'Banking Setup', city:'Kuala Lumpur', url:'https://bankpilot.asia', rating:4.2},
+      {name:'PayrollBridge', cat:'Payroll', city:'Kuching', url:'https://payrollbridge.io', rating:4.0},
+      {name:'Veritas Corporate', cat:'Company Secretary', city:'Ipoh', url:'https://veritascorporate.my', rating:4.6},
+      {name:'Tally House', cat:'Accounting', city:'Melaka', url:'https://tallyhouse.com.my', rating:4.3},
+      {name:'TaxDock', cat:'Tax', city:'Kota Bharu', url:'https://taxdock.my', rating:4.4},
+      {name:'AuditLogic', cat:'Audit', city:'Kuala Terengganu', url:'https://auditlogic.biz', rating:4.2},
+      {name:'Civic & Clay', cat:'Legal', city:'Shah Alam', url:'https://civicandclay.my', rating:4.1},
+      {name:'BankPort Asia', cat:'Banking Setup', city:'Johor Bahru', url:'https://bankport.asia', rating:4.3},
+      {name:'PayrollFlow', cat:'Payroll', city:'George Town', url:'https://payrollflow.app', rating:4.1},
+      {name:'Horizon Secretarial', cat:'Company Secretary', city:'Petaling Jaya', url:'https://horizonsecretarial.my', rating:4.6},
+      {name:'Granite Accounts', cat:'Accounting', city:'Shah Alam', url:'https://graniteaccounts.com', rating:4.3},
+      {name:'TaxNest', cat:'Tax', city:'Johor Bahru', url:'https://taxnest.my', rating:4.5},
+      {name:'AuditEdge', cat:'Audit', city:'George Town', url:'https://auditedge.biz', rating:4.2},
+      {name:'Prism Legal', cat:'Legal', city:'Kuala Lumpur', url:'https://prismlegal.my', rating:4.2},
+      {name:'BankLaunch Pro', cat:'Banking Setup', city:'Petaling Jaya', url:'https://banklaunch.pro', rating:4.1},
+      {name:'PayHive', cat:'Payroll', city:'Shah Alam', url:'https://payhive.cloud', rating:4.0},
+      {name:'Cobalt Corporate', cat:'Company Secretary', city:'Johor Bahru', url:'https://cobaltcorporate.my', rating:4.5},
+      {name:'AuditLine', cat:'Audit', city:'Shah Alam', url:'https://auditline.co', rating:4.1},
+      {name:'TaxBridge Pro', cat:'Tax', city:'Kuala Lumpur', url:'https://taxbridge.pro', rating:4.6},
+      {name:'LawBay', cat:'Legal', city:'George Town', url:'https://lawbay.my', rating:4.1},
+      {name:'BankWorks', cat:'Banking Setup', city:'Johor Bahru', url:'https://bankworks.co', rating:4.2},
+      {name:'PayrollCloud', cat:'Payroll', city:'Klang', url:'https://payrollcloud.app', rating:4.0},
+      {name:'AtlasCorpSec', cat:'Company Secretary', city:'Seremban', url:'https://atlascorpsec.my', rating:4.5},
+      {name:'Zen Accounts', cat:'Accounting', city:'Cyberjaya', url:'https://zenaccounts.com.my', rating:4.3},
+      {name:'TaxForge', cat:'Tax', city:'Kuching', url:'https://taxforge.my', rating:4.4},
+      {name:'AuditLogic Pro', cat:'Audit', city:'Ipoh', url:'https://auditlogic.pro', rating:4.2},
+      {name:'Cedar Legal', cat:'Legal', city:'Melaka', url:'https://cedarlegal.my', rating:4.2},
+      {name:'BankEdge', cat:'Banking Setup', city:'Kota Bharu', url:'https://bankedge.co', rating:4.1},
+      {name:'PayrollForge', cat:'Payroll', city:'Kuala Terengganu', url:'https://payrollforge.io', rating:4.0},
+      {name:'Nova Secretarial', cat:'Company Secretary', city:'Shah Alam', url:'https://novasecretarial.my', rating:4.5},
+      {name:'Anchor Accounts', cat:'Accounting', city:'Johor Bahru', url:'https://anchoraccounts.com', rating:4.3},
+      {name:'TaxStride', cat:'Tax', city:'George Town', url:'https://taxstride.my', rating:4.5},
+      {name:'AuditVista Pro', cat:'Audit', city:'Kuala Lumpur', url:'https://auditvistapro.com', rating:4.2},
+      {name:'Harbor Law Group', cat:'Legal', city:'Petaling Jaya', url:'https://harborlawgroup.my', rating:4.1},
+      {name:'BankConnect', cat:'Banking Setup', city:'Shah Alam', url:'https://bankconnect.co', rating:4.1},
+      {name:'PayPro', cat:'Payroll', city:'Johor Bahru', url:'https://paypro.cloud', rating:4.0},
+      {name:'Pillar Secretarial', cat:'Company Secretary', city:'George Town', url:'https://pillarsecretarial.my', rating:4.6},
+      {name:'Clarity Accounting', cat:'Accounting', city:'Klang', url:'https://clarityaccounting.com.my', rating:4.4},
+      {name:'TaxZen', cat:'Tax', city:'Seremban', url:'https://taxzen.my', rating:4.3},
+      {name:'AuditBay', cat:'Audit', city:'Cyberjaya', url:'https://auditbay.co', rating:4.1},
+      {name:'CivicLaw Pro', cat:'Legal', city:'Kuching', url:'https://civiclaw.pro', rating:4.2},
+      {name:'BankGate', cat:'Banking Setup', city:'Ipoh', url:'https://bankgate.co', rating:4.1},
+      {name:'PayrollKit', cat:'Payroll', city:'Melaka', url:'https://payrollkit.io', rating:4.0},
+      {name:'OrbitCorpSec Plus', cat:'Company Secretary', city:'Kota Kinabalu', url:'https://orbitcorpsec.plus', rating:4.6},
+      {name:'Factor Accounts', cat:'Accounting', city:'Miri', url:'https://factoraccounts.com', rating:4.3},
+      {name:'TaxFluent', cat:'Tax', city:'Alor Setar', url:'https://taxfluent.my', rating:4.4},
+      {name:'AuditPrime Asia', cat:'Audit', city:'Kangar', url:'https://auditprime.asia', rating:4.2},
+      {name:'LexCraft', cat:'Legal', city:'Kuala Terengganu', url:'https://lexcraft.my', rating:4.1},
+      {name:'BankPort Pro', cat:'Banking Setup', city:'Taiping', url:'https://bankport.pro', rating:4.2},
+      {name:'PayrollNest', cat:'Payroll', city:'Kuantan', url:'https://payrollnest.app', rating:4.0},
+      {name:'Keystone Secretarial', cat:'Company Secretary', city:'Kuala Lumpur', url:'https://keystonesec.my', rating:4.7},
+      {name:'Decimal Accounting', cat:'Accounting', city:'Petaling Jaya', url:'https://decimalaccounting.com', rating:4.4},
+      {name:'TaxMint', cat:'Tax', city:'Shah Alam', url:'https://taxmint.my', rating:4.5},
+      {name:'AuditBridge Asia', cat:'Audit', city:'Johor Bahru', url:'https://auditbridge.asia', rating:4.2},
+      {name:'Civic Legal Studio', cat:'Legal', city:'George Town', url:'https://civiclegal.studio', rating:4.2},
+      {name:'BankSprint', cat:'Banking Setup', city:'Klang', url:'https://banksprint.co', rating:4.1},
+      {name:'PayStack MY', cat:'Payroll', city:'Melaka', url:'https://paystackmy.cloud', rating:4.0}
+    ];
+
+    const dirBody = document.querySelector('#dirTable tbody');
+    const dirCount = document.getElementById('dirCount');
+    const q = document.getElementById('q');
+    const cat = document.getElementById('cat');
+    document.getElementById('filterBtn').addEventListener('click', renderDir);
+
+    function renderDir(){
+      const term = (q.value || '').toLowerCase();
+      const catVal = cat.value;
+      const filtered = data.filter(d => (!catVal || d.cat === catVal) && (!term || (d.name.toLowerCase().includes(term) || d.cat.toLowerCase().includes(term) || d.city.toLowerCase().includes(term))));
+      dirBody.innerHTML = filtered.map(d => `<tr><td>${d.name}</td><td>${d.cat}</td><td>${d.city}</td><td><a href='${d.url}' target='_blank' rel='noopener'>Visit</a></td><td>${d.rating.toFixed(1)}</td></tr>`).join('');
+      dirCount.textContent = `${filtered.length} provider${filtered.length!==1?'s':''} shown`;
+    }
+    renderDir();
+
+    // Contact form handler
+    document.getElementById('sendMsg').addEventListener('click', () => {
+      const form = document.getElementById('contactForm');
+      const fd = new FormData(form);
+      if(!form.reportValidity()) return;
+      const payload = Object.fromEntries(fd.entries());
+      localStorage.setItem('eguide_contact', JSON.stringify({...payload, ts: Date.now()}));
+      document.getElementById('contactHint').textContent = 'Thanks - message received. We will reply soon.';
+      form.reset();
+    });
+
+    // Login - client-side only
+    const loginForm = document.getElementById('loginForm');
+    const loginBtn = document.getElementById('loginBtn');
+    const userEmailEl = document.getElementById('userEmail');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    function isAuthed(){ return !!localStorage.getItem('eguide_auth'); }
+    function requireAuth(){ if(!isAuthed()) location.hash = '#/login'; }
+
+    loginBtn.addEventListener('click', () => {
+      const fd = new FormData(loginForm);
+      const email = fd.get('email');
+      const pass = fd.get('password');
+      if(!loginForm.reportValidity()) return;
+      /* client-side auth placeholder - replace with real API later */
+      localStorage.setItem('eguide_auth', JSON.stringify({email, ts: Date.now()}));
+      location.hash = '#/dashboard';
+      initDashboard();
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('eguide_auth');
+      location.hash = '#/home';
+    });
+
+    // Dashboard content
+    const tasksEl = document.getElementById('tasks');
+    document.getElementById('markAll').addEventListener('click', () => {
+      const tasks = Array.from(tasksEl.querySelectorAll('input[type=checkbox]'));
+      tasks.forEach(cb => cb.checked = true);
+    });
+
+    function initDashboard(){
+      requireAuth();
+      const auth = JSON.parse(localStorage.getItem('eguide_auth') || '{}');
+      userEmailEl.textContent = auth.email || '';
+      const items = [
+        'Choose 3 company names',
+        'Provide director and shareholder details',
+        'Upload ID documents',
+        'Confirm registered office address',
+        'Pay incorporation fee'
+      ];
+      tasksEl.innerHTML = items.map(x => `<li><label><input type='checkbox'/> ${x}</label></li>`).join('');
+    }
+
+    // Guard routes
+    window.addEventListener('hashchange', () => {
+      if(location.hash === '#/dashboard') initDashboard();
+    });
+
+    // Reset password
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      const fd = new FormData(document.getElementById('resetForm'));
+      const email = fd.get('email');
+      if(!email) return;
+      localStorage.setItem('eguide_reset', JSON.stringify({email, ts: Date.now()}));
+      alert('If this email exists, a reset link was sent. ');
+      location.hash = '#/login';
+    });
+
+    // Year in footer
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Simple PWA - inline manifest and service worker via Blob
+    (function(){
+      const manifest = {
+        name:"eGuide.my",
+        short_name:"eGuide",
+        start_url:"./#/home",
+        display:"standalone",
+        background_color:"#0b1220",
+        theme_color:"#0f172a",
+        icons:[{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' rx='64' fill='%230f172a'/%3E%3Cpath fill='%23fff' d='M62 172c0-41 33-74 74-74h58v24h-58c-28 0-50 22-50 50H62Zm0-60c0-27 9-49 27-67s41-27 67-27h38v24h-38c-40 0-70 30-70 70H62Z'/%3E%3C/svg%3E", sizes:"256x256", type:"image/svg+xml"}]
+      };
+      const manifestUrl = URL.createObjectURL(new Blob([JSON.stringify(manifest)], {type:'application/json'}));
+      const link = document.createElement('link'); link.rel='manifest'; link.href=manifestUrl; document.head.appendChild(link);
+
+      if('serviceWorker' in navigator){
+        const swCode = `self.addEventListener('install',e=>{e.waitUntil(caches.open('eguide-cache-v1').then(c=>c.addAll(['./'])))});
+        self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{const copy=res.clone();caches.open('eguide-cache-v1').then(c=>c.put(e.request,copy));return res;})).catch(()=>caches.match('./')))});`;
+        const swUrl = URL.createObjectURL(new Blob([swCode], {type:'text/javascript'}));
+        navigator.serviceWorker.register(swUrl).catch(console.warn);
+      }
+    })();
+  </script>
+</body>
+</html>
